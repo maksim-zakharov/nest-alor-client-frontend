@@ -3,14 +3,15 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import {ConfigProvider} from "antd";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
-  <React.StrictMode>
+    <ConfigProvider>
     <App />
-  </React.StrictMode>
+    </ConfigProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
