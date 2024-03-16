@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {
     DesktopOutlined,
     FileOutlined,
@@ -7,9 +7,11 @@ import {
     UserOutlined,
 } from '@ant-design/icons';
 import type {MenuProps} from 'antd';
-import {Breadcrumb, Card, Descriptions, Layout, Menu, Space, Table, theme, Typography} from 'antd';
+import {Breadcrumb, Card, Descriptions, Flex, Layout, Menu, Space, Table, theme, Typography} from 'antd';
 import {useGetChatStatsQuery} from "./services/strategies";
 import {useSearchParams} from "react-router-dom";
+import {createChart} from "lightweight-charts";
+import Chart from "./Chart";
 
 const {Header, Content, Footer, Sider} = Layout;
 
@@ -51,20 +53,10 @@ function App() {
 
     const descriptions = useMemo(() => data ? Object.entries(data).filter(([key]) => !['Диалоги', 'Недели', 'Первые сообщения', 'Рекомендации', 'Имя'].includes(key)) : [], [data])
 
-    const dataSource = [
-        {
-            key: '1',
-            name: 'Mike',
-            age: 32,
-            address: '10 Downing Street',
-        },
-        {
-            key: '2',
-            name: 'John',
-            age: 42,
-            address: '10 Downing Street',
-        },
-    ];
+    const weeks = useMemo(() => !data ? [] : Object.entries(data['Недели']).filter(([key]) => !['Среднее длительность диалога (текстом)', 'От даты', 'Диалоги'].includes(key)).map(([key, values]: any) => ({
+        key,
+        items: data['Недели']['От даты'].map((time: string, index: number) => ({time, value: values[index]}))
+    })), data);
 
     const columns = [
         {
@@ -99,6 +91,7 @@ function App() {
             key: 'durationHum',
         },
     ];
+
     return (
         <Layout style={{minHeight: '100vh'}}>
             <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
@@ -122,7 +115,17 @@ function App() {
                         </Descriptions>
                     </Card>
                     <Typography.Title level={3}>Диалоги</Typography.Title>
-                    <Table dataSource={data?.['Диалоги'] || []} loading={isLoading} columns={columns}/>;
+                    <Table dataSource={data?.['Диалоги'] || []} loading={isLoading} columns={columns}/>
+                    <Flex wrap="wrap" gap="small">
+                        {weeks.map(w => <div style={{
+                            textOverflow: 'ellipsis',
+                            width: '400px',
+                            overflow: 'hidden'
+                        }}>
+                            <Typography.Title level={4}>{w.key}</Typography.Title>
+                            <Chart items={w.items}/>
+                        </div>)}
+                    </Flex>
                 </Content>
                 <Footer style={{textAlign: 'center'}}>
                     Ant Design ©{new Date().getFullYear()} Created by Ant UED
