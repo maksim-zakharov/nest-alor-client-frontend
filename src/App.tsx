@@ -6,12 +6,26 @@ import {
     TeamOutlined,
     UserOutlined,
 } from '@ant-design/icons';
-import type {MenuProps} from 'antd';
-import {Breadcrumb, Card, Descriptions, Flex, Layout, Menu, Space, Table, theme, Typography} from 'antd';
+import type {DatePickerProps, MenuProps} from 'antd';
+import {
+    Breadcrumb,
+    Card,
+    DatePicker,
+    Descriptions,
+    Flex,
+    Layout,
+    Menu,
+    Select,
+    Space,
+    Table,
+    theme,
+    Typography
+} from 'antd';
 import {useGetChatStatsQuery} from "./services/strategies";
 import {useSearchParams} from "react-router-dom";
 import {createChart} from "lightweight-charts";
 import Chart from "./Chart";
+import dayjs from 'dayjs';
 
 const {Header, Content, Footer, Sider} = Layout;
 
@@ -49,14 +63,27 @@ function App() {
     const fromDate = searchParams.get('fromDate') || '2024-03-07';
     const chatId = searchParams.get('chatId') || '738792308';
 
-    const {data, isLoading} = useGetChatStatsQuery({fromDate, chatId})
+    const [search, setSearch] = useState(chatId);
+
+    const {data, isFetching: isLoading} = useGetChatStatsQuery({fromDate, chatId})
 
     const descriptions = useMemo(() => data ? Object.entries(data).filter(([key]) => !['Диалоги', 'Недели', 'Первые сообщения', 'Рекомендации', 'Имя'].includes(key)) : [], [data])
 
-    const weeks = useMemo(() => !data ? [] : Object.entries(data['Недели']).filter(([key]) => !['Среднее длительность диалога (текстом)', 'От даты', 'Диалоги'].includes(key)).map(([key, values]: any) => ({
+    const weeks = useMemo(() => (!data || data['Сколько дней общаемся'] < 7) ? [] : Object.entries(data['Недели']).filter(([key]) => !['Среднее длительность диалога (текстом)', 'От даты', 'Диалоги'].includes(key)).map(([key, values]: any) => ({
         key,
         items: data['Недели']['От даты'].map((time: string, index: number) => ({time, value: values[index]}))
     })), data);
+
+    const [ids, setIds] = useState<string[]>(localStorage.getItem('ids') ? JSON.parse(localStorage.getItem('ids')!) : [])
+
+    const saveId = (id: string) => {
+        setIds((prev: any) => {
+            const newArr = Array.from(new Set([...prev, id]));
+            localStorage.setItem('ids', JSON.stringify(newArr));
+
+            return newArr;
+        });
+    }
 
     const columns = [
         {
@@ -92,6 +119,53 @@ function App() {
         },
     ];
 
+    const onChange: DatePickerProps['onChange'] = (date, dateString) => {
+        searchParams.set('fromDate', dateString.toString())
+
+        setSearchParams(searchParams)
+    };
+
+    const audioKeys = [
+        'Аудио отправлено',
+        'Аудио отправлено в день',
+        'Аудио получено',
+        'Аудио получено в день',
+        'Ср. длина аудио отправлено',
+        'Ср. длина аудио отправлено в день',
+        'Ср. длина аудио получено',
+        'Ср. длина аудио получено в день'
+    ]
+
+    const videoKeys = [
+        'Видео отправлено',
+        'Видео получено',
+        'Кружочков отправлено',
+        'Кружочков отправлено в день',
+        'Кружочков получено',
+        'Кружочков получено в день',
+        'Ср. длина кружочка отправлено',
+        'Ср. длина кружочка отправлено в день',
+        'Ср. длина кружочка получено',
+        'Ср. длина кружочка получено в день',
+        'Ср. длина видео отправлено',
+        'Ср. длина видео отправлено в день',
+        'Ср. длина видео получено',
+        'Ср. длина видео получено в день'
+    ]
+
+    function onSearch(val: string) {
+        setSearch(val)
+    }
+
+    const handleKeyPress = (event: any) => {
+        if(event.key === 'Enter' && search){
+            searchParams.set('chatId', search);
+            setSearchParams(searchParams);
+
+            saveId(search);
+        }
+    }
+
     return (
         <Layout style={{minHeight: '100vh'}}>
             <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
@@ -101,13 +175,36 @@ function App() {
             <Layout>
                 <Header style={{padding: 0}}/>
                 <Content style={{margin: '0 16px'}}>
-                    <Breadcrumb style={{margin: '16px 0'}}>
-                        <Breadcrumb.Item>User</Breadcrumb.Item>
-                        <Breadcrumb.Item>Bill</Breadcrumb.Item>
-                    </Breadcrumb>
+                    <div style={{margin: '16px 0', display: 'flex', gap: '16px'}}>
+                        <Select
+                            showSearch
+                            value={search}
+                            placeholder="Введи айди диалога"
+                            onSearch={onSearch}
+                            onKeyDown={handleKeyPress}
+                            options={ids.map(i => ({value: i, label: i}))}
+                        />
+                        <DatePicker onChange={onChange} value={dayjs(fromDate, "YYYY-MM-DD")}/>
+                    </div>
                     <Card loading={isLoading} title={data?.['Имя']}>
-                        <Descriptions layout="vertical">
-                            {descriptions.map((item: any) => <Descriptions.Item
+                        <Descriptions layout="vertical" title="Аудио">
+                            {descriptions.filter(([key]) => audioKeys.includes(key)).map((item: any) =>
+                                <Descriptions.Item
+                                    label={item[0]}>{typeof item[1] === 'number' ? new Intl.NumberFormat('eu-EU', {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 2
+                                }).format(item[1]) : item[1]}</Descriptions.Item>)}
+                        </Descriptions>
+                        <Descriptions layout="vertical" title="Видео">
+                            {descriptions.filter(([key]) => videoKeys.includes(key)).map((item: any) =>
+                                <Descriptions.Item
+                                    label={item[0]}>{typeof item[1] === 'number' ? new Intl.NumberFormat('eu-EU', {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 2
+                                }).format(item[1]) : item[1]}</Descriptions.Item>)}
+                        </Descriptions>
+                        <Descriptions layout="vertical" title="Разное">
+                            {descriptions.filter(([key]) => !videoKeys.includes(key) && !audioKeys.includes(key)).map((item: any) => <Descriptions.Item
                                 label={item[0]}>{typeof item[1] === 'number' ? new Intl.NumberFormat('eu-EU', {
                                 minimumFractionDigits: 0,
                                 maximumFractionDigits: 2
