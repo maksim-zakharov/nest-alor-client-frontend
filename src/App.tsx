@@ -257,28 +257,32 @@ function App() {
                     </Card>
                     <Typography.Title level={3}>Диалоги</Typography.Title>
                     <Table dataSource={data?.['Диалоги'] || []} loading={isLoading} columns={columns}/>
-                    <Typography.Title level={3}>Основные метрики</Typography.Title>
-                    {data && data['Сколько дней общаемся'] >=7 && <Flex wrap="wrap" gap="small">
-                        {weeks.filter(({key}) => weekMainMetrics.includes(key)).map(w => <div key={w.key} style={{
-                            textOverflow: 'ellipsis',
-                            width: '400px',
-                            overflow: 'hidden'
-                        }}>
-                            <Typography.Title level={4}>{w.key}</Typography.Title>
-                            <Chart items={w.items}/>
-                        </div>)}
-                    </Flex>}
-                    <Typography.Title level={3}>Спорные метрики</Typography.Title>
-                    {data && data['Сколько дней общаемся'] >=7 && <Flex wrap="wrap" gap="small">
-                        {weeks.filter(({key}) => !weekMainMetrics.includes(key)).map(w => <div key={w.key} style={{
-                            textOverflow: 'ellipsis',
-                            width: '400px',
-                            overflow: 'hidden'
-                        }}>
-                            <Typography.Title level={4}>{w.key}</Typography.Title>
-                            <Chart items={w.items}/>
-                        </div>)}
-                    </Flex>}
+                    {data && data['Сколько дней общаемся'] >=7 && <>
+                        <Typography.Title level={3}>Основные метрики</Typography.Title>
+                        <Flex wrap="wrap" gap="small">
+                            {weeks.filter(({key}) => weekMainMetrics.includes(key)).map(w => <div key={w.key} style={{
+                                textOverflow: 'ellipsis',
+                                width: '400px',
+                                overflow: 'hidden'
+                            }}>
+                                <Typography.Title level={4}>{w.key}</Typography.Title>
+                                <Chart items={w.items}/>
+                            </div>)}
+                        </Flex>
+                    </>}
+                    {data && data['Сколько дней общаемся'] >=7 && <>
+                        <Typography.Title level={3}>Спорные метрики</Typography.Title>
+                        <Flex wrap="wrap" gap="small">
+                            {weeks.filter(({key}) => !weekMainMetrics.includes(key)).map(w => <div key={w.key} style={{
+                                textOverflow: 'ellipsis',
+                                width: '400px',
+                                overflow: 'hidden'
+                            }}>
+                                <Typography.Title level={4}>{w.key}</Typography.Title>
+                                <Chart items={w.items}/>
+                            </div>)}
+                        </Flex>
+                    </>}
                 </Content>
                 <Footer style={{textAlign: 'center'}}>
                     Ant Design ©{new Date().getFullYear()} Created by Ant UED
