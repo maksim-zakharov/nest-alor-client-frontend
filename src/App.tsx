@@ -176,6 +176,25 @@ function App() {
         }
     }
 
+    const weekMainMetrics = [
+'Сообщений получено',
+        'Сообщений отправлено',
+        'Текстовых сообщений получено',
+        'Текстовых сообщений отправлено',
+        'Сообщений получено в день',
+        'Сообщений отправлено в день',
+        'Видео получено',
+        'Видео отправлено',
+        'Кружочков получено',
+        'Кружочков отправлено',
+        'Кружочков получено в день',
+        'Кружочков отправлено в день',
+        'Аудио получено',
+        'Аудио отправлено',
+        'Аудио получено в день',
+        'Аудио отправлено в день'
+    ]
+
     return (
         <Layout style={{minHeight: '100vh'}}>
             <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
@@ -238,8 +257,20 @@ function App() {
                     </Card>
                     <Typography.Title level={3}>Диалоги</Typography.Title>
                     <Table dataSource={data?.['Диалоги'] || []} loading={isLoading} columns={columns}/>
+                    <Typography.Title level={3}>Основные метрики</Typography.Title>
                     {data && data['Сколько дней общаемся'] >=7 && <Flex wrap="wrap" gap="small">
-                        {weeks.map(w => <div style={{
+                        {weeks.filter(({key}) => weekMainMetrics.includes(key)).map(w => <div key={w.key} style={{
+                            textOverflow: 'ellipsis',
+                            width: '400px',
+                            overflow: 'hidden'
+                        }}>
+                            <Typography.Title level={4}>{w.key}</Typography.Title>
+                            <Chart items={w.items}/>
+                        </div>)}
+                    </Flex>}
+                    <Typography.Title level={3}>Спорные метрики</Typography.Title>
+                    {data && data['Сколько дней общаемся'] >=7 && <Flex wrap="wrap" gap="small">
+                        {weeks.filter(({key}) => !weekMainMetrics.includes(key)).map(w => <div key={w.key} style={{
                             textOverflow: 'ellipsis',
                             width: '400px',
                             overflow: 'hidden'
