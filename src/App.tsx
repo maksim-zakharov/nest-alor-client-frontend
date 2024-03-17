@@ -11,8 +11,8 @@ import {
     Breadcrumb,
     Card,
     DatePicker,
-    Descriptions,
-    Flex,
+    Descriptions, Divider,
+    Flex, Form,
     Layout,
     Menu,
     Select,
@@ -26,6 +26,7 @@ import {useSearchParams} from "react-router-dom";
 import {createChart} from "lightweight-charts";
 import Chart from "./Chart";
 import dayjs from 'dayjs';
+import FormItem from "antd/es/form/FormItem";
 
 const {Header, Content, Footer, Sider} = Layout;
 
@@ -125,6 +126,15 @@ function App() {
         setSearchParams(searchParams)
     };
 
+    const commonKeys = [
+'От даты',
+        'Сообщений получено',
+        'Сообщений отправлено',
+        'Сколько дней общаемся',
+        'Сообщений получено в день',
+        'Сообщений отправлено в день'
+    ]
+
     const audioKeys = [
         'Аудио отправлено',
         'Аудио отправлено в день',
@@ -175,18 +185,31 @@ function App() {
             <Layout>
                 <Header style={{padding: 0}}/>
                 <Content style={{margin: '0 16px'}}>
-                    <div style={{margin: '16px 0', display: 'flex', gap: '16px'}}>
-                        <Select
-                            showSearch
-                            value={search}
-                            placeholder="Введи айди диалога"
-                            onSearch={onSearch}
-                            onKeyDown={handleKeyPress}
-                            options={ids.map(i => ({value: i, label: i}))}
-                        />
-                        <DatePicker onChange={onChange} value={dayjs(fromDate, "YYYY-MM-DD")}/>
-                    </div>
+                    <Form style={{margin: '24px 0 0', display: 'flex', gap: '16px'}}>
+                        <FormItem label="ID аккаунта">
+                            <Select
+                                showSearch
+                                value={search}
+                                placeholder="Введи айди диалога"
+                                onSearch={onSearch}
+                                onKeyDown={handleKeyPress}
+                                options={ids.map(i => ({value: i, label: i}))}
+                            />
+                        </FormItem>
+                        <FormItem label="Дата первого сообщения">
+                            <DatePicker onChange={onChange} value={dayjs(fromDate, "YYYY-MM-DD")}/>
+                        </FormItem>
+                    </Form>
                     <Card loading={isLoading} title={data?.['Имя']}>
+                        <Descriptions layout="vertical" title="Общее">
+                            {descriptions.filter(([key]) => commonKeys.includes(key)).map((item: any) =>
+                                <Descriptions.Item
+                                    label={item[0]}>{typeof item[1] === 'number' ? new Intl.NumberFormat('eu-EU', {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 2
+                                }).format(item[1]) : item[1]}</Descriptions.Item>)}
+                        </Descriptions>
+                        <Divider/>
                         <Descriptions layout="vertical" title="Аудио">
                             {descriptions.filter(([key]) => audioKeys.includes(key)).map((item: any) =>
                                 <Descriptions.Item
@@ -195,6 +218,7 @@ function App() {
                                     maximumFractionDigits: 2
                                 }).format(item[1]) : item[1]}</Descriptions.Item>)}
                         </Descriptions>
+                        <Divider/>
                         <Descriptions layout="vertical" title="Видео">
                             {descriptions.filter(([key]) => videoKeys.includes(key)).map((item: any) =>
                                 <Descriptions.Item
@@ -203,8 +227,9 @@ function App() {
                                     maximumFractionDigits: 2
                                 }).format(item[1]) : item[1]}</Descriptions.Item>)}
                         </Descriptions>
+                        <Divider/>
                         <Descriptions layout="vertical" title="Разное">
-                            {descriptions.filter(([key]) => !videoKeys.includes(key) && !audioKeys.includes(key)).map((item: any) => <Descriptions.Item
+                            {descriptions.filter(([key]) => !videoKeys.includes(key) && !audioKeys.includes(key) && !commonKeys.includes(key)).map((item: any) => <Descriptions.Item
                                 label={item[0]}>{typeof item[1] === 'number' ? new Intl.NumberFormat('eu-EU', {
                                 minimumFractionDigits: 0,
                                 maximumFractionDigits: 2
