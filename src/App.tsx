@@ -70,7 +70,7 @@ function App() {
 
     const descriptions = useMemo(() => data ? Object.entries(data).filter(([key]) => !['Диалоги', 'Недели', 'Первые сообщения', 'Рекомендации', 'Имя'].includes(key)) : [], [data])
 
-    const weeks = useMemo(() => (!data || data['Сколько дней общаемся'] < 7) ? [] : Object.entries(data['Недели']).filter(([key]) => !['Среднее длительность диалога (текстом)', 'От даты', 'Диалоги'].includes(key)).map(([key, values]: any) => ({
+    const weeks = useMemo(() => (!data) ? [] : Object.entries(data['Недели']).filter(([key]) => !['Среднее длительность диалога (текстом)', 'От даты', 'Диалоги'].includes(key)).map(([key, values]: any) => ({
         key,
         items: data['Недели']['От даты'].map((time: string, index: number) => ({time, value: values[index]}))
     })), data);
@@ -238,7 +238,7 @@ function App() {
                     </Card>
                     <Typography.Title level={3}>Диалоги</Typography.Title>
                     <Table dataSource={data?.['Диалоги'] || []} loading={isLoading} columns={columns}/>
-                    <Flex wrap="wrap" gap="small">
+                    {data['Сколько дней общаемся'] >=7 && <Flex wrap="wrap" gap="small">
                         {weeks.map(w => <div style={{
                             textOverflow: 'ellipsis',
                             width: '400px',
@@ -247,7 +247,7 @@ function App() {
                             <Typography.Title level={4}>{w.key}</Typography.Title>
                             <Chart items={w.items}/>
                         </div>)}
-                    </Flex>
+                    </Flex>}
                 </Content>
                 <Footer style={{textAlign: 'center'}}>
                     Ant Design ©{new Date().getFullYear()} Created by Ant UED
