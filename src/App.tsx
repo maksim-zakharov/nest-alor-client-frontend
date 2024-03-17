@@ -238,7 +238,7 @@ function App() {
                     </Card>
                     <Typography.Title level={3}>Диалоги</Typography.Title>
                     <Table dataSource={data?.['Диалоги'] || []} loading={isLoading} columns={columns}/>
-                    {data['Сколько дней общаемся'] >=7 && <Flex wrap="wrap" gap="small">
+                    {data && data['Сколько дней общаемся'] >=7 && <Flex wrap="wrap" gap="small">
                         {weeks.map(w => <div style={{
                             textOverflow: 'ellipsis',
                             width: '400px',
