@@ -70,7 +70,7 @@ function App() {
 
     const descriptions = useMemo(() => data ? Object.entries(data).filter(([key]) => !['Диалоги', 'Недели', 'Первые сообщения', 'Рекомендации', 'Имя'].includes(key)) : [], [data])
 
-    const weeks = useMemo(() => (!data) ? [] : Object.entries(data['Недели']).filter(([key]) => !['Среднее длительность диалога (текстом)', 'От даты', 'Диалоги'].includes(key)).map(([key, values]: any) => ({
+    const weeks = useMemo(() => (!data) ? [] : Object.entries(data['Недели']).filter(([key]) => !['Среднее длительность диалога (текстом)', 'От даты', 'Диалоги', 'Средняя длительность общения в день (текстом)'].includes(key)).map(([key, values]: any) => ({
         key,
         items: data['Недели']['От даты'].map((time: string, index: number) => ({time, value: values[index]}))
     })), data);
