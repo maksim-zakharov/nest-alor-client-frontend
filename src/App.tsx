@@ -135,6 +135,13 @@ function App() {
         'Сообщений отправлено в день'
     ]
 
+    const photoKeys = [
+        'Фото отправлено',
+        'Фото отправлено в день',
+        'Фото получено',
+        'Фото получено в день'
+    ]
+
     const audioKeys = [
         'Аудио отправлено',
         'Аудио отправлено в день',
@@ -235,6 +242,15 @@ function App() {
                                 }).format(item[1]) : item[1]}</Descriptions.Item>)}
                         </Descriptions>
                         <Divider/>
+                        <Descriptions layout="vertical" title="Фото">
+                            {descriptions.filter(([key]) => photoKeys.includes(key)).map((item: any) =>
+                                <Descriptions.Item
+                                    label={item[0]}>{typeof item[1] === 'number' ? new Intl.NumberFormat('eu-EU', {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 2
+                                }).format(item[1]) : item[1]}</Descriptions.Item>)}
+                        </Descriptions>
+                        <Divider/>
                         <Descriptions layout="vertical" title="Аудио">
                             {descriptions.filter(([key]) => audioKeys.includes(key)).map((item: any) =>
                                 <Descriptions.Item
@@ -254,7 +270,7 @@ function App() {
                         </Descriptions>
                         <Divider/>
                         <Descriptions layout="vertical" title="Разное">
-                            {descriptions.filter(([key]) => !videoKeys.includes(key) && !audioKeys.includes(key) && !commonKeys.includes(key)).map((item: any) => <Descriptions.Item
+                            {descriptions.filter(([key]) => !videoKeys.includes(key) && !photoKeys.includes(key) && !audioKeys.includes(key) && !commonKeys.includes(key)).map((item: any) => <Descriptions.Item
                                 label={item[0]}>{typeof item[1] === 'number' ? new Intl.NumberFormat('eu-EU', {
                                 minimumFractionDigits: 0,
                                 maximumFractionDigits: 2
