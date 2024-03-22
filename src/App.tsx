@@ -217,6 +217,11 @@ function App() {
         items: data['Недели']['От даты'].map((time: string, index: number) => ({time, value: data['Недели']['Сообщений получено'][index] / (data['Недели']['Сообщений получено'][index] + data['Недели']['Сообщений отправлено'][index])}))
     }, [data]);
 
+    const dayInterest = useMemo(() => (!data || !data['Дни']) ? undefined : {
+        key: 'Интерес по сообщениям',
+        items: data['Дни']['От даты'].map((time: string, index: number) => ({time, value: data['Дни']['Сообщений получено'][index] / (data['Дни']['Сообщений получено'][index] + data['Дни']['Сообщений отправлено'][index])}))
+    }, [data]);
+
     return (
         <Layout style={{minHeight: '100vh'}}>
             <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
@@ -312,13 +317,13 @@ function App() {
                     {data && data['Сколько дней общаемся'] >=7 && <>
                         <Typography.Title level={3}>Основные метрики (дни)</Typography.Title>
                         <Flex wrap="wrap" gap="small">
-                            {weekInterest && <div key={weekInterest.key} style={{
+                            {dayInterest && <div key={dayInterest.key} style={{
                                 textOverflow: 'ellipsis',
                                 width: '400px',
                                 overflow: 'hidden'
                             }}>
-                                <Typography.Title level={4}>{weekInterest.key}</Typography.Title>
-                                <Chart items={weekInterest.items}/>
+                                <Typography.Title level={4}>{dayInterest.key}</Typography.Title>
+                                <Chart items={dayInterest.items}/>
                             </div>}
                             {days.filter(({key}) => weekMainMetrics.includes(key)).map(w => <div key={w.key} style={{
                                 textOverflow: 'ellipsis',
