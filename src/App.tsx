@@ -68,7 +68,12 @@ function App() {
 
     const {data, isFetching: isLoading} = useGetChatStatsQuery({fromDate, chatId})
 
-    const descriptions = useMemo(() => data ? Object.entries(data).filter(([key]) => !['Диалоги', 'Недели', 'Первые сообщения', 'Рекомендации', 'Имя'].includes(key)) : [], [data])
+    const descriptions = useMemo(() => data ? Object.entries(data).filter(([key]) => !['Диалоги', 'Дни', 'Недели', 'Первые сообщения', 'Рекомендации', 'Имя'].includes(key)) : [], [data])
+
+    const days = useMemo(() => (!data) ? [] : Object.entries(data['Дни']).filter(([key]) => !['Среднее длительность диалога (текстом)', 'Прошло с последнего сообщения от отправителя (часов)', 'От даты', 'Диалоги', 'Средняя длительность общения в день (текстом)'].includes(key)).map(([key, values]: any) => ({
+        key,
+        items: data['Дни']['От даты'].map((time: string, index: number) => ({time, value: values[index]}))
+    })), data);
 
     const weeks = useMemo(() => (!data) ? [] : Object.entries(data['Недели']).filter(([key]) => !['Среднее длительность диалога (текстом)', 'Прошло с последнего сообщения от отправителя (часов)', 'От даты', 'Диалоги', 'Средняя длительность общения в день (текстом)'].includes(key)).map(([key, values]: any) => ({
         key,
@@ -284,7 +289,7 @@ function App() {
                     <Typography.Title level={3}>Диалоги</Typography.Title>
                     <Table dataSource={data?.['Диалоги'] || []} loading={isLoading} columns={columns}/>
                     {data && data['Сколько дней общаемся'] >=7 && <>
-                        <Typography.Title level={3}>Основные метрики</Typography.Title>
+                        <Typography.Title level={3}>Основные метрики (недели)</Typography.Title>
                         <Flex wrap="wrap" gap="small">
                             {weekInterest && <div key={weekInterest.key} style={{
                                 textOverflow: 'ellipsis',
@@ -295,6 +300,27 @@ function App() {
                                 <Chart items={weekInterest.items}/>
                             </div>}
                             {weeks.filter(({key}) => weekMainMetrics.includes(key)).map(w => <div key={w.key} style={{
+                                textOverflow: 'ellipsis',
+                                width: '400px',
+                                overflow: 'hidden'
+                            }}>
+                                <Typography.Title level={4}>{w.key}</Typography.Title>
+                                <Chart items={w.items}/>
+                            </div>)}
+                        </Flex>
+                    </>}
+                    {data && data['Сколько дней общаемся'] >=7 && <>
+                        <Typography.Title level={3}>Основные метрики (дни)</Typography.Title>
+                        <Flex wrap="wrap" gap="small">
+                            {weekInterest && <div key={weekInterest.key} style={{
+                                textOverflow: 'ellipsis',
+                                width: '400px',
+                                overflow: 'hidden'
+                            }}>
+                                <Typography.Title level={4}>{weekInterest.key}</Typography.Title>
+                                <Chart items={weekInterest.items}/>
+                            </div>}
+                            {days.filter(({key}) => weekMainMetrics.includes(key)).map(w => <div key={w.key} style={{
                                 textOverflow: 'ellipsis',
                                 width: '400px',
                                 overflow: 'hidden'
