@@ -5,10 +5,11 @@ import {
     PieChartOutlined,
     TeamOutlined,
     UserOutlined,
+    CopyOutlined,
 } from '@ant-design/icons';
 import type {DatePickerProps, MenuProps} from 'antd';
 import {
-    Breadcrumb,
+    Breadcrumb, Button,
     Card,
     DatePicker,
     Descriptions, Divider,
@@ -222,7 +223,21 @@ function App() {
         items: data['Дни']['От даты'].map((time: string, index: number) => ({time, value: data['Дни']['Сообщений получено'][index] / (data['Дни']['Сообщений получено'][index] + data['Дни']['Сообщений отправлено'][index])}))
     }, [data]);
 
-    const gptPrompt = useMemo(() => '', []);
+    const last2WeeksText = useMemo(() => weeks.find(w => w.key === 'Текстовых сообщений получено')?.items || [], [weeks])
+    const last2WeeksAudio = useMemo(() => weeks.find(w => w.key === 'Аудио получено')?.items || [], [weeks])
+    const last2WeeksRound = useMemo(() => weeks.find(w => w.key === 'Кружочков получено')?.items || [], [weeks])
+    const last2WeeksVideo = useMemo(() => weeks.find(w => w.key === 'Видео получено')?.items || [], [weeks])
+    const last2WeeksInterests = useMemo(() => weeks.find(w => w.key === 'Частота первого сообщения')?.items || [], [weeks])
+
+    const gptPrompt = useMemo(() => `
+    На этой неделе девушка писала первая в ${last2WeeksInterests.slice(-1)[0]?.value.toFixed(2)}% случаев. На прошлой проявляла в ${last2WeeksInterests.slice(-2)[0]?.value.toFixed(2)}% случаев.\n
+    На этой неделе девушка писала прислала ${last2WeeksText.slice(-1)[0]?.value} текстовых сообщений. На прошлой прислала ${last2WeeksText.slice(-2)[0]?.value} текстовых сообщений.\n
+    На этой неделе девушка писала прислала ${last2WeeksAudio.slice(-1)[0]?.value} аудио сообщений. На прошлой прислала ${last2WeeksAudio.slice(-2)[0]?.value} аудио сообщений.\n
+    На этой неделе девушка писала прислала ${last2WeeksRound.slice(-1)[0]?.value} селфи-видео сообщений. На прошлой прислала ${last2WeeksRound.slice(-2)[0]?.value} селфи-видео сообщений.\n
+    На этой неделе девушка писала прислала ${last2WeeksVideo.slice(-1)[0]?.value} видео сообщений. На прошлой прислала ${last2WeeksVideo.slice(-2)[0]?.value} видео сообщений.\n
+    `, [last2WeeksInterests]);
+
+    const onCopy = () => navigator.clipboard.writeText(gptPrompt)
 
     return (
         <Layout style={{minHeight: '100vh'}}>
@@ -292,7 +307,8 @@ function App() {
                                 maximumFractionDigits: 2
                             }).format(item[1]) : item[1]}</Descriptions.Item>)}
                         </Descriptions>
-                        <Descriptions layout="vertical" title="Промпт для нейросети">
+                        <Divider/>
+                        <Descriptions layout="vertical" title="Промпт для нейросети" extra={<Button type="link" onClick={onCopy}><CopyOutlined /></Button>}>
                             <Descriptions.Item>
                                 {gptPrompt}
                             </Descriptions.Item>
