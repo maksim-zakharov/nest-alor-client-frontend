@@ -32,7 +32,7 @@ const Chart: FC<IProps> = ({items}) => {
             color: '#1677ff'
         });
         if (items) {
-            lineSeries.setData(items);
+            lineSeries.setData(Array.from(new Map<string, any>(items.map(i => [i.time, i]))).map(i => i[1]));
         }
     }, [chartContainerRef.current, items]);
 

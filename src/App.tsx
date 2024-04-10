@@ -222,6 +222,8 @@ function App() {
         items: data['Дни']['От даты'].map((time: string, index: number) => ({time, value: data['Дни']['Сообщений получено'][index] / (data['Дни']['Сообщений получено'][index] + data['Дни']['Сообщений отправлено'][index])}))
     }, [data]);
 
+    const gptPrompt = useMemo(() => '', []);
+
     return (
         <Layout style={{minHeight: '100vh'}}>
             <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
@@ -289,6 +291,11 @@ function App() {
                                 minimumFractionDigits: 0,
                                 maximumFractionDigits: 2
                             }).format(item[1]) : item[1]}</Descriptions.Item>)}
+                        </Descriptions>
+                        <Descriptions layout="vertical" title="Промпт для нейросети">
+                            <Descriptions.Item>
+                                {gptPrompt}
+                            </Descriptions.Item>
                         </Descriptions>
                     </Card>
                     <Typography.Title level={3}>Диалоги</Typography.Title>
