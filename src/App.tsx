@@ -230,14 +230,20 @@ function App() {
     const last2WeeksPhoto = useMemo(() => weeks.find(w => w.key === 'Фото получено')?.items || [], [weeks])
     const last2WeeksInterests = useMemo(() => weeks.find(w => w.key === 'Частота первого сообщения')?.items || [], [weeks])
 
-    const gptPrompt = useMemo(() => `
+    const gptPrompt = useMemo<string>(() => {
+        if(last2WeeksInterests.length < 2 || last2WeeksText.length < 2 || last2WeeksPhoto.length < 2 || last2WeeksAudio.length < 2 || last2WeeksRound.length < 2 || last2WeeksVideo.length < 2) {
+            return '';
+        }
+
+        return `
     На этой неделе девушка писала первая в ${last2WeeksInterests.slice(-1)[0]?.value.toFixed(2)}% случаев. На прошлой проявляла в ${last2WeeksInterests.slice(-2)[0]?.value.toFixed(2)}% случаев.\n
     На этой неделе девушка писала прислала ${last2WeeksText.slice(-1)[0]?.value} текстовых сообщений. На прошлой прислала ${last2WeeksText.slice(-2)[0]?.value} текстовых сообщений.\n
     На этой неделе девушка писала прислала ${last2WeeksPhoto.slice(-1)[0]?.value} фотографий. На прошлой прислала ${last2WeeksPhoto.slice(-2)[0]?.value} фотографий.\n
     На этой неделе девушка писала прислала ${last2WeeksAudio.slice(-1)[0]?.value} аудио сообщений. На прошлой прислала ${last2WeeksAudio.slice(-2)[0]?.value} аудио сообщений.\n
     На этой неделе девушка писала прислала ${last2WeeksRound.slice(-1)[0]?.value} селфи-видео сообщений. На прошлой прислала ${last2WeeksRound.slice(-2)[0]?.value} селфи-видео сообщений.\n
     На этой неделе девушка писала прислала ${last2WeeksVideo.slice(-1)[0]?.value} видео сообщений. На прошлой прислала ${last2WeeksVideo.slice(-2)[0]?.value} видео сообщений.\n
-    `, [last2WeeksInterests]);
+    `
+    }, [last2WeeksInterests, last2WeeksText, last2WeeksPhoto, last2WeeksAudio, last2WeeksRound, last2WeeksVideo]);
 
     const onCopy = () => navigator.clipboard.writeText(gptPrompt)
 
