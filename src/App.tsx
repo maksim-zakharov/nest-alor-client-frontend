@@ -235,14 +235,14 @@ function App() {
             return '';
         }
 
-        return `
+        return `Оцени как изменилось отношение девушки ко мне по следующим метрикам: "
     На этой неделе девушка писала первая в ${Math.floor(last2WeeksInterests.slice(-1)[0]?.value * 100)}% случаев. На прошлой неделе девушка писала первая в ${Math.floor(last2WeeksInterests.slice(-2)[0]?.value * 100)}% случаев.\n
     На этой неделе девушка писала прислала ${last2WeeksText.slice(-1)[0]?.value} текстовых сообщений. На прошлой неделе девушка писала прислала ${last2WeeksText.slice(-2)[0]?.value} текстовых сообщений.\n
     На этой неделе девушка писала прислала ${last2WeeksPhoto.slice(-1)[0]?.value} фотографий. На прошлой неделе девушка писала прислала ${last2WeeksPhoto.slice(-2)[0]?.value} фотографий.\n
     На этой неделе девушка писала прислала ${last2WeeksAudio.slice(-1)[0]?.value} аудио сообщений. На прошлой неделе девушка писала прислала ${last2WeeksAudio.slice(-2)[0]?.value} аудио сообщений.\n
     На этой неделе девушка писала прислала ${last2WeeksRound.slice(-1)[0]?.value} селфи-видео сообщений. На прошлой неделе девушка писала прислала ${last2WeeksRound.slice(-2)[0]?.value} селфи-видео сообщений.\n
     На этой неделе девушка писала прислала ${last2WeeksVideo.slice(-1)[0]?.value} видео сообщений. На прошлой неделе девушка писала прислала ${last2WeeksVideo.slice(-2)[0]?.value} видео сообщений.\n
-    `
+    "`
     }, [last2WeeksInterests, last2WeeksText, last2WeeksPhoto, last2WeeksAudio, last2WeeksRound, last2WeeksVideo]);
 
     const onCopy = () => navigator.clipboard.writeText(gptPrompt)
